@@ -7,7 +7,7 @@
       gems = lib.buildGemset { name = "ratalada"; src = ./.; };
     in
     {
-      devShells.x86_64-linux.default = lib.mkRubyViteShell {
+      devShells.x86_64-linux.default = lib.mkRubyShell {
         buildInputs = [ gems gems.wrappedRuby ];
       };
     };
