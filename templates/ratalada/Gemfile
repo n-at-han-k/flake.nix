@@ -2,4 +2,10 @@
 
 source "https://rubygems.org"
 
-gem "json"
+gem "ratalada"
+gem "ratalada-contrib"
+gem "ratalada-sinatra"
+gem "multijson"
+
+gem "vite_ruby"
+gem "extralite-bundle"

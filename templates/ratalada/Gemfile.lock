@@ -1,0 +1,65 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    base64 (0.3.0)
+    concurrent-ruby (1.3.8)
+    dry-cli (1.4.1)
+    dry-configurable (1.4.0)
+      dry-core (~> 1.0)
+      zeitwerk (~> 2.6)
+    dry-core (1.2.0)
+      concurrent-ruby (~> 1.0)
+      logger
+      zeitwerk (~> 2.6)
+    logger (1.7.0)
+    multijson (0.0.1)
+    mustermann (3.1.1)
+    mutex_m (0.3.0)
+    rack (3.2.7)
+    rack-protection (4.2.1)
+      base64 (>= 0.1.0)
+      logger (>= 1.6.0)
+      rack (>= 3.0.0, < 4)
+    rack-proxy (2.0.1)
+      rack (>= 2.0, < 4)
+    rack-session (2.1.2)
+      base64 (>= 0.1.0)
+      rack (>= 3.0.0)
+    ratalada (3.0.0)
+      dry-configurable (~> 1.4)
+      rack (~> 3.0)
+    ratalada-contrib (3.1.0)
+      mustermann (> 2)
+      ratalada (~> 3.0)
+    ratalada-sinatra (3.0.0)
+      ratalada (~> 3.0)
+      sinatra
+    sinatra (4.2.1)
+      logger (>= 1.6.0)
+      mustermann (~> 3.0)
+      rack (>= 3.0.0, < 4)
+      rack-protection (= 4.2.1)
+      rack-session (>= 2.0.0, < 3)
+      tilt (~> 2.0)
+    tilt (2.9.0)
+    vite_ruby (3.11.0)
+      dry-cli (>= 0.7, < 2)
+      logger (~> 1.6)
+      mutex_m
+      rack-proxy (>= 0.6.1)
+      zeitwerk (~> 2.2)
+    zeitwerk (2.8.3)
+
+PLATFORMS
+  ruby
+  x86_64-linux
+
+DEPENDENCIES
+  multijson
+  ratalada
+  ratalada-contrib
+  ratalada-sinatra
+  vite_ruby
+
+BUNDLED WITH
+   2.7.2
