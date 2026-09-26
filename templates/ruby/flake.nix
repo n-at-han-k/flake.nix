@@ -1,6 +1,6 @@
 {
   inputs.mine.url = "github:n-at-han-k/flake.nix";
-  inputs.nixpkgs.url = "github:nixos/nixpkgs/unstable";
+  inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-26.05";
   inputs.flake-utils.url = "github:numtide/flake-utils";
 
   outputs = { mine, nixpkgs, flake-utils, ... }:
