@@ -6,17 +6,24 @@
 
   outputs = { self, nixpkgs, systems }:
     let
-      names = [
+      # Safe to put in an overlay: nothing in stdenv references them.
+      leafNames = [
         "ruby_3_4"
         "bundix"
-        "libyaml"
-        "openssl"
         "nodejs"
         "pnpm"
         "tmux"
         "overmind"
-        "pkg-config"
       ];
+
+      # NOT safe to overlay. stdenv splices pkg-config, and openssl/libyaml sit
+      # deep in its closure, so overriding any of them in the fixpoint rebuilds
+      # stdenv and all of nixpkgs from source. Exported as packages so a
+      # consumer can take the pinned build explicitly, where it only affects
+      # what they asked for.
+      stdenvNames = [ "libyaml" "openssl" "pkg-config" ];
+
+      names = leafNames ++ stdenvNames;
 
       eachSystem = nixpkgs.lib.genAttrs (import systems);
       pick = pkgs: nixpkgs.lib.getAttrs names pkgs;
@@ -28,8 +35,10 @@
       # every consumer resolves the same derivation hashes. That pin is the
       # whole point of this overlay, so it stays in flake.nix — a plain
       # overlay.nix could only ever hand back the consumer's own attrs.
+      # leafNames only: see stdenvNames above.
       overlays.default = final: prev:
-        pick nixpkgs.legacyPackages.${prev.stdenv.hostPlatform.system};
+        nixpkgs.lib.getAttrs leafNames
+          nixpkgs.legacyPackages.${prev.stdenv.hostPlatform.system};
 
       # lib.nix holds the builders; this flake only re-exports them per system.
       # Per-system: mine.lib.${system}.mkRubyShell { ... }
