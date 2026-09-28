@@ -24,9 +24,11 @@ rec {
 
   mkRubyShell = attrs: mkShell (mkShellMerge {
     nativeBuildInputs = [ pkgs.pkg-config ];
-    buildInputs = with pkgs; [ bundix libyaml openssl overmind tmux ];
+    buildInputs = with pkgs; [ bundix git libyaml openssl overmind tmux ];
+    # Services run these shells too, often as a user who cannot write the
+    # checkout; skip the regen rather than dump a backtrace every start.
     shellHook = ''
-      bundix -l
+      if [ -w gemset.nix ]; then bundix -l; fi
     '';
   } attrs);
 
@@ -37,7 +39,7 @@ rec {
       # pnpmConfigHook only runs as a build phase; devShells run none.
       shellHook = ''
         pnpm install
-        git add -N .
+        if [ -w .git ]; then git add -N .; fi
         runHook postPatch
       '';
     }
