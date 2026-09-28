@@ -24,55 +24,17 @@
     {
       packages = eachSystem (system: pick nixpkgs.legacyPackages.${system});
 
-      # Takes the packages from THIS flake's nixpkgs, not the consumer's,
-      # so every consumer resolves the same derivation hashes.
+      # Takes the packages from THIS flake's nixpkgs, not the consumer's, so
+      # every consumer resolves the same derivation hashes. That pin is the
+      # whole point of this overlay, so it stays in flake.nix — a plain
+      # overlay.nix could only ever hand back the consumer's own attrs.
       overlays.default = final: prev:
         pick nixpkgs.legacyPackages.${prev.stdenv.hostPlatform.system};
 
+      # lib.nix holds the builders; this flake only re-exports them per system.
       # Per-system: mine.lib.${system}.mkRubyShell { ... }
-      lib = eachSystem (system:
-        let
-          pkgs = nixpkgs.legacyPackages.${system};
-        in
-        rec {
-          # Appends buildInputs/nativeBuildInputs/shellHook; anything else in
-          # attrs replaces the base.
-          mkShellMerge = base: attrs: base // attrs // {
-            nativeBuildInputs = (base.nativeBuildInputs or [ ]) ++ (attrs.nativeBuildInputs or [ ]);
-            buildInputs = (base.buildInputs or [ ]) ++ (attrs.buildInputs or [ ]);
-            shellHook = (base.shellHook or "") + (attrs.shellHook or "");
-          };
-
-          buildGemset = { name, src, ruby ? pkgs.ruby_3_4 }:
-            pkgs.bundlerEnv {
-              inherit name ruby;
-              gemfile = src + "/Gemfile";
-              lockfile = src + "/Gemfile.lock";
-              gemset = src + "/gemset.nix";
-            };
-
-          mkShell = attrs: pkgs.mkShell (mkShellMerge { } attrs);
-
-          mkRubyShell = attrs: mkShell (mkShellMerge {
-            nativeBuildInputs = [ pkgs.pkg-config ];
-            buildInputs = with pkgs; [ bundix libyaml openssl overmind tmux ];
-            shellHook = ''
-              bundix -l
-            '';
-          } attrs);
-
-          mkRubyViteShell = attrs: mkRubyShell (mkShellMerge
-            {
-              nativeBuildInputs = [ pkgs.pnpmConfigHook ];
-              buildInputs = with pkgs; [ nodejs pnpm ];
-              # pnpmConfigHook only runs as a build phase; devShells run none.
-              shellHook = ''
-                pnpm install
-                git add -N .
-                runHook postPatch
-              '';
-            }
-            attrs);
-        });
+      lib = eachSystem (system: import ./lib.nix {
+        pkgs = nixpkgs.legacyPackages.${system};
+      });
     };
 }
